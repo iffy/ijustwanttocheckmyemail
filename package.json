@@ -1,5 +1,9 @@
 {
-    "name": "ijustwanttocheckmyemail",
-    "version": "0.1.0",
-    "main": "main.js"
+  "name": "ijustwanttocheckmyemail",
+  "version": "0.1.0",
+  "main": "main.js",
+  "devDependencies": {
+    "electron-packager": "^7.2.0",
+    "electron-prebuilt": "^1.2.5"
+  }
 }
