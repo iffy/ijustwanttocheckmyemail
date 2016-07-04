@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Just a minute...</title>
+    <style>
+    * {
+      box-sizing: border-box;
+    }
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      font-family: arial;
+    }
+    body {
+      padding: 1rem;
+      -webkit-app-region: drag;
+    }
+    #timeleft {
+      font-weight: bold;
+    }
+    .action-buttons {
+
+    }
+    .action-buttons button {
+      background: white;
+      border-radius: 2px;
+      padding: 1rem;
+      font-size: 1rem;
+      display: block;
+      margin-top: 0.2rem;
+      border: 1px solid lightgrey;
+      width: 100%;
+    }
+    .action-buttons button:hover {
+      background-color: skyblue;
+      cursor: pointer;
+    }
+    </style>
+  </head>
+  <body>
+    <p>
+      WiFi left: <span id="timeleft" class="timeleft"></span>
+    </p>
+
+    <div class="action-buttons">
+    <button class="add-time-btn" minutes="1">+1 minute</button>
+    <button class="add-time-btn" minutes="2">+2 minutes</button>
+    <button class="add-time-btn" minutes="5">+5 minutes</button>
+    <button class="add-time-btn" minutes="15">+15 minutes</button>
+    <button class="add-time-btn" minutes="20">+20 minutes</button>
+    </div>
+    <script>
+    const {ipcRenderer} = require('electron');
+
+    let timeleft = 0;
+
+    function setup() {
+      // timer
+      setInterval(function() {
+        var stoptime = ipcRenderer.sendSync('stoptime?');
+        timeleft = stoptime - Date.now();
+        var secondsleft = timeleft > 0 ? timeleft/1000.0 : 0;
+        var minutesleft = Math.floor(secondsleft / 60);
+        secondsleft = Math.floor(secondsleft % 60);
+
+        secondsleft = '0' + secondsleft;
+        var timestr = minutesleft + ':' + secondsleft.substr(-2);
+
+        var displays = document.body.querySelectorAll("span.timeleft");
+        displays.forEach(function(display) {
+          display.innerHTML = timestr;
+        });
+        document.title = timestr + ' Just a minute...';
+
+        //document.getElementById('timeleft').innerHTML = timestr;
+      }, 1000);
+
+      // buttons
+      var buttons = document.body.querySelectorAll("button.add-time-btn");
+      buttons.forEach(function(button) {
+        var seconds = parseInt(button.getAttribute('minutes')) * 60;
+        button.addEventListener('click', function() {
+          ipcRenderer.send('add-time', seconds);
+        });
+      })
+    }
+    setup();
+    </script>
+  </body>
+</html>
